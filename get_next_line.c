@@ -6,7 +6,7 @@
 /*   By: adapassa <adapassa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 11:58:24 by adapassa          #+#    #+#             */
-/*   Updated: 2024/01/26 13:23:57 by adapassa         ###   ########.fr       */
+/*   Updated: 2024/01/30 18:13:36 by adapassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -134,7 +134,9 @@ static char **buffer_handler(char *buffer, int fd)
     char    **stock;
     int     read_bytes;
 
-    tmp = (char *)calloc(sizeof(char), (BUFFER_SIZE + 1));
+    //stock = NULL;
+    //trim_result = NULL;
+    tmp = (char *)calloc(sizeof(char), (BUFFER_SIZE));
     if (!tmp)
         return (NULL);
     read_bytes = read(fd, tmp, BUFFER_SIZE);
@@ -146,28 +148,27 @@ static char **buffer_handler(char *buffer, int fd)
     trim_result = trim_buffer(tmp);
     if (trim_result != NULL)
         stock = (char **)calloc(sizeof(char *), 2);
-    else
-        stock = (char **)calloc(sizeof(char *), 1);
     if (!stock)
     {
-        free(tmp);
         return (NULL);
     }
     if (trim_result)
     {
-        tmp = trim_result[0];
-        tmp = ft_strjoin(tmp, "\n");
+        free(tmp);
+        tmp = ft_strjoin(trim_result[0], "\n");
         stock[1] = ft_strdup(trim_result[1]);
-        free(trim_result[0]);
         free(trim_result[1]);
+        free(trim_result[0]);
         free(trim_result);
     }
     if (buffer)
         tmp = ft_strjoin(buffer, tmp);
     stock[0] = ft_strdup(tmp);
+    //free(trim_result);
     free(tmp);
     return (stock);
 }
+
 
 char    *get_next_line(int fd)
 {
@@ -175,18 +176,23 @@ char    *get_next_line(int fd)
     static char     *res;
     char            *next_line;
     char            **holder;
-    int             i;
 
-    i = 0;
     next_line = NULL;
     stock_buffer = NULL;
+    holder = NULL;
     // Last control to fix the segfault with invalid fd
     if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, next_line, 0) < 0)
 	    return (NULL);
     if (res)
 	    stock_buffer = ft_strjoin(stock_buffer, res);
+    free(res);
     while (ft_strchr(stock_buffer, '\n') == 0)
     {
+        if (holder != NULL)
+        {
+            free(holder[0]);
+            free(holder);
+        }
         holder = buffer_handler(stock_buffer, fd);
         if (holder == NULL && stock_buffer == NULL)
         {
@@ -199,16 +205,26 @@ char    *get_next_line(int fd)
         {
             res = NULL;
             next_line = stock_buffer;
-            //free(stock_buffer);
+            //if (stock_buffer != NULL)
+             //   free(stock_buffer);
             return (next_line);
         }
         stock_buffer = ft_strdup(holder[0]);
-        res = ft_strdup(holder[1]);
+        //res = NULL;
+        //free(res);
+        //printf("%d\n", ft_mat_len(holder));
+        //if (sizeof(holder) == 16)
+        //printf("%ld\n", sizeof(holder));
+        //printf("%s\n", holder[1]);
+        if (holder[1])
+            res = ft_strdup(holder[1]);
+        //printf("%d\n", ft_mat_len(holder));
     }
     next_line = ft_strdup(stock_buffer);
-	free(holder[0]);
 	free(holder[1]);
+	free(holder[0]);
     free(holder);
+    //free(res);
     free(stock_buffer);
     return (next_line);
 }
