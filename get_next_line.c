@@ -6,7 +6,7 @@
 /*   By: adapassa <adapassa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 11:58:24 by adapassa          #+#    #+#             */
-/*   Updated: 2024/01/30 18:13:36 by adapassa         ###   ########.fr       */
+/*   Updated: 2024/02/01 14:41:45 by adapassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -119,7 +119,7 @@ char **trim_buffer(char *str)
     {
         if (str[i] == '\n')
         {
-            tmp = ft_split(str, '\n');
+            tmp = ft_minisplit(str);
             return (tmp);
         }
         i++;
@@ -136,18 +136,18 @@ static char **buffer_handler(char *buffer, int fd)
 
     //stock = NULL;
     //trim_result = NULL;
-    tmp = (char *)calloc(sizeof(char), (BUFFER_SIZE));
+    tmp = (char *)calloc(sizeof(char), (BUFFER_SIZE + 1));
     if (!tmp)
         return (NULL);
     read_bytes = read(fd, tmp, BUFFER_SIZE);
+    tmp[ft_strlen(tmp)] = '\0'; 
     if (read_bytes == 0)
     {
         free(tmp);
         return (NULL);
     }
     trim_result = trim_buffer(tmp);
-    if (trim_result != NULL)
-        stock = (char **)calloc(sizeof(char *), 2);
+    stock = (char **)calloc(sizeof(char *), 2);
     if (!stock)
     {
         return (NULL);
@@ -161,10 +161,7 @@ static char **buffer_handler(char *buffer, int fd)
         free(trim_result[0]);
         free(trim_result);
     }
-    if (buffer)
-        tmp = ft_strjoin(buffer, tmp);
-    stock[0] = ft_strdup(tmp);
-    //free(trim_result);
+    stock[0] = ft_strjoin(buffer, tmp);
     free(tmp);
     return (stock);
 }
@@ -184,7 +181,23 @@ char    *get_next_line(int fd)
     if (fd < 0 || BUFFER_SIZE <= 0 || read(fd, next_line, 0) < 0)
 	    return (NULL);
     if (res)
-	    stock_buffer = ft_strjoin(stock_buffer, res);
+    {
+        if (ft_strchr(res, '\n') != 0)
+        {
+            holder = ft_minisplit(res);
+            free(res);
+            res = ft_strdup(holder[1]);
+            stock_buffer = ft_strdup(holder[0]);
+            next_line = ft_strjoin(stock_buffer, "\n");
+            free(stock_buffer);
+            free(holder[1]);
+	        free(holder[0]);
+            free(holder);
+            return (next_line);
+        }
+        else
+	        stock_buffer = ft_strjoin(stock_buffer, res);
+    }
     free(res);
     while (ft_strchr(stock_buffer, '\n') == 0)
     {
@@ -200,7 +213,12 @@ char    *get_next_line(int fd)
             return (NULL);
         }
         else if (holder == NULL && stock_buffer[0] == '\0')
+        {
+            //if (res)
+            //    free(res);
+            free(stock_buffer);
             return (NULL);
+        }
         else if (holder == NULL)
         {
             res = NULL;
@@ -209,6 +227,7 @@ char    *get_next_line(int fd)
              //   free(stock_buffer);
             return (next_line);
         }
+        free(stock_buffer);
         stock_buffer = ft_strdup(holder[0]);
         //res = NULL;
         //free(res);

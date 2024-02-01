@@ -6,7 +6,7 @@
 /*   By: adapassa <adapassa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 18:19:19 by adapassa          #+#    #+#             */
-/*   Updated: 2024/01/30 15:48:35 by adapassa         ###   ########.fr       */
+/*   Updated: 2024/02/01 13:22:06 by adapassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -63,89 +63,41 @@ char	*ft_substr(char const *s, unsigned int start, size_t len)
 
 /////////////////////////////////////////////////////////////////////////////
 
-static int	ft_count(char const *s, char c)
+char	**ft_minisplit(char *str)
 {
-	int	i;
-	int	sn;
-
+	char **tmp;
+	int i;
+	int j;
 	i = 0;
-	sn = 0;
-	while (s[i] != 0)
-	{
-		if (s[i] != c)
-		{
-			sn++;
-			while (s[i] != c && s[i] != '\0')
-				i++;
-		}
-		if (s[i] != '\0')
-			i++;
-	}
-	return (sn);
-}
-
-static size_t	ft_superstrlen(const char *s, char c)
-{
-	int	i;
-
-	i = 0;
-	while (s[i] != c && s[i] != '\0')
-	{
-		i++;
-	}
-	return (i);
-}
-
-static char	**malloc_error(char **str)
-{
-	size_t	i;
-
-	i = 0;
-	while (str[i])
-	{
-		free(str[i]);
-		i++;
-	}
-	free(str);
-	return (NULL);
-}
-
-static char	**main_procedure(char **str, int *i, char *s, char c)
-{
-	while (s[++i[0]] != 0)
-	{
-		if (s[i[0]] != c)
-		{
-			str[i[1]] = ft_substr(s, i[0], ft_superstrlen(&s[i[0]], c));
-			if (!str[i[1]])
-				return (malloc_error(str));
-			i[0] = i[0] + ft_superstrlen(&s[i[0]], c);
-			break ;
-		}
-	}
-	i[1]++;
-	return (str);
-}
-
-char	**ft_split(const char *s, char c)
-{
-	int		ns;
-	char	**str;
-	int		i[2];
-
-	i[1] = 0;
-	i[0] = -1;
-	ns = ft_count(s, c);
-	str = ft_calloc((ns + 1), sizeof(char *));
+	tmp = (char **)ft_calloc(sizeof(char*), 2);
+	if (!tmp)
+		return (NULL);
 	if (!str)
 		return (NULL);
-	while (ns--)
+	while (str[i] != '\n')
+		i++;
+	tmp[0] = (char *)ft_calloc(sizeof(char), i + 1);
+	i = 0;
+	while (str[i] != '\0')
+		i++;
+	tmp[1] = ft_calloc(sizeof(char), i + 1);
+	i = 0;
+	while (str[i] != '\n')
 	{
-		if (main_procedure(str, i, (char *)s, c) == NULL)
-			return (NULL);
+		tmp[0][i] = str[i];
+		i++;
 	}
-	str[i[1]] = 0;
-	return (str);
+	tmp[0][i] = '\0';
+	j = i + 1;
+	i = 0;
+	while (str[j] != '\0')
+	{
+		tmp[1][i] = str[j];
+		i++;
+		j++;
+	}
+	tmp[1][i] = '\0';
+	return (tmp);
 }
 
 //////////////////////////////////////////////////////////////////////
