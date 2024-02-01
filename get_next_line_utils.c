@@ -6,74 +6,100 @@
 /*   By: adapassa <adapassa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 18:19:19 by adapassa          #+#    #+#             */
-/*   Updated: 2024/02/01 13:22:06 by adapassa         ###   ########.fr       */
+/*   Updated: 2024/02/01 19:21:53 by adapassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-void	ft_bzero(void *str, size_t n)
+int	ft_strlen(char *str)
 {
-	size_t	i;
+	int	i;
 
 	i = 0;
-	while (i < n)
-		((char *)str)[i++] = 0;
+	if (!str)
+		return (0);
+	while (str[i] != '\0')
+		i++;
+	return (i);
+}
+
+void	*ft_free_mat(char **mat, char *str)
+{
+	if (str == NULL)
+	{
+		if (mat[1] != NULL)
+			free(mat[1]);
+		free(mat[0]);
+		free(mat);
+	}
+	else if (mat == NULL)
+		free(str);
+	else if ((mat != NULL) && (str != NULL))
+	{
+		free(mat[1]);
+		free(mat[0]);
+		free(mat);
+		free(str);
+	}
+	else if (!mat && !str)
+		return (NULL);
+	return (NULL);
 }
 
 void	*ft_calloc(size_t nmemb, size_t size)
 {
-	void	*ptr;
+	char		*ptr;
+	size_t		i;
 
 	ptr = malloc(nmemb * size);
+	i = 0;
 	if (!ptr)
 		return (NULL);
-	ft_memset ((unsigned char *)ptr, 0, nmemb * size);
-	return (ptr);
+	while (i < (nmemb * size))
+		ptr[i++] = 0;
+	return ((void *)ptr);
 }
 
-char	*ft_substr(char const *s, unsigned int start, size_t len)
+char	*ft_strjoin(char const *s1, char const *s2)
 {
-	char			*sub_str;
-	unsigned int	i;
+	char	*s3;
+	int		i;
+	int		j;
 
-	if (!s)
-		return (NULL);
-	if (start > (unsigned int)ft_strlen((char *)s))
-	{
-		sub_str = ft_calloc(sizeof(char), 1);
-		return (sub_str);
-	}
-	if (ft_strlen((char *)s) - start > len)
-		sub_str = malloc(sizeof(char) * ((len + 1)));
-	else
-		sub_str = malloc(sizeof(char)
-				* (((unsigned int)ft_strlen((char *)s) - start) + 1));
-	if (sub_str == NULL)
-		return (NULL);
 	i = 0;
-	while ((char)s[start] && (size_t)i < len)
+	j = 0;
+	s3 = (char *)calloc(sizeof(char),
+			(ft_strlen((char *)s1) + ft_strlen((char *)s2) + 1));
+	if (!s3)
+		return (0);
+	if (s1)
 	{
-		sub_str[i++] = (char)s[start];
-		start++;
+		while (s1[i] != '\0')
+		{
+			s3[i] = s1[i];
+			i++;
+		}
 	}
-	sub_str[i] = 0;
-	return (sub_str);
+	while (s2[j] != '\0')
+	{
+		s3[i + j] = s2[j];
+		j++;
+	}
+	s3[i + j] = '\0';
+	return (s3);
 }
 
 /////////////////////////////////////////////////////////////////////////////
 
 char	**ft_minisplit(char *str)
 {
-	char **tmp;
-	int i;
-	int j;
+	char	**tmp;
+	int		i;
+	int		j;
+
 	i = 0;
-	tmp = (char **)ft_calloc(sizeof(char*), 2);
-	if (!tmp)
-		return (NULL);
-	if (!str)
-		return (NULL);
+	tmp = (char **)ft_calloc(sizeof(char *), 2);
 	while (str[i] != '\n')
 		i++;
 	tmp[0] = (char *)ft_calloc(sizeof(char), i + 1);
@@ -81,35 +107,16 @@ char	**ft_minisplit(char *str)
 	while (str[i] != '\0')
 		i++;
 	tmp[1] = ft_calloc(sizeof(char), i + 1);
-	i = 0;
-	while (str[i] != '\n')
-	{
+	i = -1;
+	while (str[++i] != '\n')
 		tmp[0][i] = str[i];
-		i++;
-	}
 	tmp[0][i] = '\0';
 	j = i + 1;
 	i = 0;
 	while (str[j] != '\0')
-	{
-		tmp[1][i] = str[j];
-		i++;
-		j++;
-	}
+		tmp[1][i++] = str[j++];
 	tmp[1][i] = '\0';
 	return (tmp);
 }
 
 //////////////////////////////////////////////////////////////////////
-
-void	*ft_memset(void *str, int c, size_t n)
-{
-	char	*ptr;
-	size_t	i;
-
-	i = 0;
-	ptr = str;
-	while (i < n)
-		ptr[i++] = c;
-	return ((void *)ptr);
-}
