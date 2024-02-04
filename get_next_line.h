@@ -6,7 +6,7 @@
 /*   By: adapassa <adapassa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 11:58:27 by adapassa          #+#    #+#             */
-/*   Updated: 2024/02/01 19:29:47 by adapassa         ###   ########.fr       */
+/*   Updated: 2024/02/04 13:35:41 by adapassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,6 +23,7 @@
 # include <string.h>
 # include <stdlib.h>
 # include <stdbool.h>
+# include <stddef.h>
 
 # define FALSE 0
 # define TRUE 1
@@ -37,13 +38,9 @@
 
 char	*get_next_line(int fd);
 char	**ft_minisplit(char *str);
-void	*ft_calloc(size_t nmemb, size_t size);
-int		ft_strlen(char *str);
-void	*ft_calloc(size_t nmemb, size_t size);
 char	*ft_strjoin(char const *s1, char const *s2);
-//char	*ft_strchr(const char *s, int c);
+char	*ft_strdup(const char *src);
 void	*ft_free_mat(char **mat, char *str);
-//char	*ft_strdup(const char *s);
-//void	*ft_memcpy(void *dest, const void *src, size_t n);
+void    *ft_custom_function(size_t nmemb, size_t size, char *str, bool flag);
 
 #endif

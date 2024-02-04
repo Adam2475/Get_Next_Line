@@ -6,35 +6,16 @@
 /*   By: adapassa <adapassa@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/22 18:19:19 by adapassa          #+#    #+#             */
-/*   Updated: 2024/02/01 19:21:53 by adapassa         ###   ########.fr       */
+/*   Updated: 2024/02/04 17:55:45 by adapassa         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line.h"
 
-int	ft_strlen(char *str)
-{
-	int	i;
-
-	i = 0;
-	if (!str)
-		return (0);
-	while (str[i] != '\0')
-		i++;
-	return (i);
-}
-
 void	*ft_free_mat(char **mat, char *str)
 {
-	if (str == NULL)
-	{
-		if (mat[1] != NULL)
-			free(mat[1]);
-		free(mat[0]);
-		free(mat);
-	}
-	else if (mat == NULL)
-		free(str);
+	if (!mat && !str)
+		return (NULL);
 	else if ((mat != NULL) && (str != NULL))
 	{
 		free(mat[1]);
@@ -42,23 +23,59 @@ void	*ft_free_mat(char **mat, char *str)
 		free(mat);
 		free(str);
 	}
-	else if (!mat && !str)
-		return (NULL);
+	else if (str == NULL)
+	{
+		free(mat[1]);
+		free(mat[0]);
+		free(mat);
+	}
+	else if (mat == NULL)
+		free(str);
 	return (NULL);
 }
 
-void	*ft_calloc(size_t nmemb, size_t size)
+void	*ft_custom_function(size_t nmemb, size_t size, char *str, bool flag)
 {
-	char		*ptr;
-	size_t		i;
+	char	*ptr;
+	size_t	i = 0;
+	int	length = 0;
 
-	ptr = malloc(nmemb * size);
-	i = 0;
+	if (flag == TRUE)
+	{
+		ptr = (char *)malloc(nmemb * size);
 	if (!ptr)
-		return (NULL);
+		return NULL;
 	while (i < (nmemb * size))
 		ptr[i++] = 0;
-	return ((void *)ptr);
+	return (void *)ptr;
+	}
+	else
+	{
+		while (str && str[length] != '\0')
+			length++;
+		return (void *)(long int)length;
+	}
+}
+
+char	*ft_strdup(const char *src)
+{
+	char	*dest;
+	long int		l;
+	size_t	i;
+
+	i = -1;
+	if (!src)
+		return (NULL);
+	l = (long int)ft_custom_function(0, 0, (char *)src, 0);
+	dest = malloc(sizeof(char) * (l + 1));
+	if (!src)
+		return (0);
+	if (!dest)
+		return (0);
+	while (++i <= (size_t)l)
+		((char *)dest)[i] = ((char *)src)[i];
+	dest[l] = '\0';
+	return (dest);
 }
 
 char	*ft_strjoin(char const *s1, char const *s2)
@@ -69,8 +86,8 @@ char	*ft_strjoin(char const *s1, char const *s2)
 
 	i = 0;
 	j = 0;
-	s3 = (char *)calloc(sizeof(char),
-			(ft_strlen((char *)s1) + ft_strlen((char *)s2) + 1));
+	s3 = (char *)ft_custom_function(sizeof(char),
+			((long int)ft_custom_function(0, 0, (char *)s1, 0) + (long int)ft_custom_function(0, 0, (char *)s2, 0) + 1),NULL, 1);
 	if (!s3)
 		return (0);
 	if (s1)
@@ -90,8 +107,6 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	return (s3);
 }
 
-/////////////////////////////////////////////////////////////////////////////
-
 char	**ft_minisplit(char *str)
 {
 	char	**tmp;
@@ -99,14 +114,14 @@ char	**ft_minisplit(char *str)
 	int		j;
 
 	i = 0;
-	tmp = (char **)ft_calloc(sizeof(char *), 2);
+	tmp = (char **)ft_custom_function(sizeof(char *), 2, NULL, 1);
 	while (str[i] != '\n')
 		i++;
-	tmp[0] = (char *)ft_calloc(sizeof(char), i + 1);
+	tmp[0] = (char *)ft_custom_function(sizeof(char), (i + 1), NULL, 1);
 	i = 0;
 	while (str[i] != '\0')
 		i++;
-	tmp[1] = ft_calloc(sizeof(char), i + 1);
+	tmp[1] = ft_custom_function(sizeof(char), (i + 1), NULL, 1);
 	i = -1;
 	while (str[++i] != '\n')
 		tmp[0][i] = str[i];
@@ -118,5 +133,3 @@ char	**ft_minisplit(char *str)
 	tmp[1][i] = '\0';
 	return (tmp);
 }
-
-//////////////////////////////////////////////////////////////////////
